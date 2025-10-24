@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Coding on sleepydog</title>
+    <link>http://localhost:50882/notes-site/tags/coding/</link>
+    <description>Recent content in Coding on sleepydog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 24 Oct 2025 22:06:52 +0000</lastBuildDate>
+    <atom:link href="http://localhost:50882/notes-site/tags/coding/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Coding Interview Prep (ML Infra)</title>
+      <link>http://localhost:50882/notes-site/posts/job-hunting/coding/</link>
+      <pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate>
+      <guid>http://localhost:50882/notes-site/posts/job-hunting/coding/</guid>
+      <description>Interview prep notes for ML Inference positions.</description>
+    </item>
+  </channel>
+</rss>

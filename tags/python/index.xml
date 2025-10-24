@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Python on sleepydog</title>
+    <link>http://localhost:1313/notes-site/tags/python/</link>
+    <description>Recent content in Python on sleepydog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 24 Oct 2025 18:00:00 -0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/notes-site/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Code Highlighting Test</title>
+      <link>http://localhost:1313/notes-site/posts/code-highlighting-test/</link>
+      <pubDate>Fri, 24 Oct 2025 18:00:00 -0400</pubDate>
+      <guid>http://localhost:1313/notes-site/posts/code-highlighting-test/</guid>
+      <description>Testing code syntax highlighting in Hugo</description>
+    </item>
+  </channel>
+</rss>
