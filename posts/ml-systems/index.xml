@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ML Systems on sleepydog</title>
+    <link>https://sleepydog-q.github.io/notes-site/posts/ml-systems/</link>
+    <description>Recent content in ML Systems on sleepydog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <atom:link href="https://sleepydog-q.github.io/notes-site/posts/ml-systems/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

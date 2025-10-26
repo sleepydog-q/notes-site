@@ -1,1 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ml-Inference on sleepydog</title><link>https://sleepydog-q.github.io/notes-site/tags/ml-inference/</link><description>Recent content in Ml-Inference on sleepydog</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 24 Oct 2025 22:28:05 +0000</lastBuildDate><atom:link href="https://sleepydog-q.github.io/notes-site/tags/ml-inference/index.xml" rel="self" type="application/rss+xml"/><item><title>ML Inference / Infra Interview Prep</title><link>https://sleepydog-q.github.io/notes-site/posts/job-hunting/ml-inference/</link><pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate><guid>https://sleepydog-q.github.io/notes-site/posts/job-hunting/ml-inference/</guid><description>Interview prep notes for ML Inference positions.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ml-Inference on sleepydog</title>
+    <link>https://sleepydog-q.github.io/notes-site/tags/ml-inference/</link>
+    <description>Recent content in Ml-Inference on sleepydog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 26 Oct 2025 04:10:44 +0000</lastBuildDate>
+    <atom:link href="https://sleepydog-q.github.io/notes-site/tags/ml-inference/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Interview Prep: ML Inference and Infrastructure (LLM)</title>
+      <link>https://sleepydog-q.github.io/notes-site/posts/job-hunting/ml-inference/</link>
+      <pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/posts/job-hunting/ml-inference/</guid>
+      <description>Interview prep notes for ML Inference positions.</description>
+    </item>
+  </channel>
+</rss>

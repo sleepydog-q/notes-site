@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Prep: Communication Collectives (NCCL &amp; PyTorch) | sleepydog</title>
+    <meta name="description" content="Personal blog and knowledge base">
+    
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #2c3e50;
+            --link-color: #3498db;
+            --border-color: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --header-bg: #ffffff;
+            --card-bg: #ffffff;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1e1e1e;
+                --text-color: #e4e4e4;
+                --link-color: #58a6ff;
+                --border-color: #30363d;
+                --code-bg: #161b22;
+                --header-bg: #161b22;
+                --card-bg: #0d1117;
+                --shadow: 0 2px 8px rgba(0,0,0,0.4);
+            }
+            
+            a {
+                color: #58a6ff;
+            }
+            
+            a:hover {
+                color: #79c0ff;
+            }
+            
+            .category-tag {
+                color: #aaa;
+                background: #2a2a2a;
+                border-color: #444;
+            }
+            
+            .category-tag:hover {
+                color: #58a6ff;
+                border-color: #58a6ff;
+            }
+            
+            .tag {
+                color: #888;
+            }
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-size: 17px;
+            line-height: 1.7;
+            color: var(--text-color);
+            background: var(--bg-color);
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        header {
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        
+        nav a:hover {
+            color: var(--link-color);
+        }
+        
+        main {
+            min-height: 70vh;
+            padding: 1.5rem 0;
+        }
+        
+        article {
+            margin-bottom: 2rem;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            margin: 1.5rem 0 1rem;
+            line-height: 1.3;
+            font-weight: 600;
+            scroll-margin-top: 5rem;  
+        }
+        
+        h1 { font-size: 2rem; margin-top: 0; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.25rem; }
+        
+         
+        .post-content > h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            color: #003d7a;
+            text-decoration: underline;
+        }
+        
+        p {
+            margin: 1rem 0;
+        }
+        
+        article p:has(+ ul),
+        article p:has(+ ol) {
+            margin-bottom: 0.25rem;
+        }
+        
+        .post-meta {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin: 0.25rem 0 1.5rem;
+            line-height: 1.6;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        .post-meta time {
+            color: #6c757d;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .post-meta .lastmod-inline {
+            color: #6c757d;
+        }
+        
+        .date-icon {
+            vertical-align: middle;
+            opacity: 0.7;
+        }
+        
+        .post-meta .word-count,
+        .post-meta .reading-time {
+            color: #6c757d;
+        }
+        
+        .post-meta .word-count::before {
+            content: " ";
+            margin-left: 0.3rem;
+        }
+        
+        .post-meta .categories,
+        .post-meta .tags {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+        
+        .comments-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .post-list {
+            list-style: none;
+        }
+        
+        .post-item {
+            padding: 1.5rem 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .post-item:hover {
+            background: transparent;
+        }
+        
+        .post-item h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        
+        .post-item h2 a {
+            color: var(--text-color);
+        }
+        
+        .post-meta-compact {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .author-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .author-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .meta-separator {
+            color: #999;
+        }
+        
+        .category-link {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+        
+        .category-link:hover {
+            text-decoration: underline;
+        }
+        
+        .post-summary {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .categories {
+            display: inline;
+            margin-right: 0.5rem;
+        }
+        
+        .category-tag {
+            font-size: 0.8rem;
+            color: #555;
+            text-decoration: none;
+            margin-right: 0.5rem;
+            padding: 0.1rem 0.4rem;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #f8f8f8;
+        }
+        
+        .category-tag:hover {
+            color: #0066cc;
+            border-color: #0066cc;
+            text-decoration: none;
+        }
+        
+        .tag {
+            font-size: 0.8rem;
+            color: #999;
+            margin-right: 0.75rem;
+        }
+        
+        .tag::before {
+            content: "#";
+        }
+        
+        .tags {
+            display: inline;
+        }
+        
+        footer {
+            background: var(--header-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        code {
+            background: var(--code-bg);
+            padding: 0.1rem 0.3rem;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #f6f8fa;
+            padding: 0.4rem 0.6rem;
+            overflow-x: auto;
+            margin: 0.4rem 0;
+            border: 1px solid #d0d7de;
+            border-radius: 4px;
+            line-height: 1.4;
+            font-size: 0.85rem;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            border: none;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', monospace;
+            font-size: inherit;
+            line-height: inherit;
+        }
+        
+        article ul, article ol {
+            margin: 0.3rem 0;
+            padding-left: 2rem;
+        }
+        
+        article ul {
+            list-style-type: disc;
+        }
+        
+        article ol {
+            list-style-type: decimal;
+        }
+        
+        article li {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+        
+        article li > ul, article li > ol {
+            margin: 0.5rem 0;
+        }
+        
+        article li > p {
+            margin: 0.25rem 0;
+        }
+        
+        article strong {
+            font-weight: 600;
+        }
+        
+        article em {
+            font-style: italic;
+        }
+        
+        .post-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .post-content {
+            flex: 1;
+            min-width: 0;
+            max-width: 100%;
+        }
+        
+        .toc-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+        }
+        
+        .toc-sticky {
+            position: sticky;
+            top: 5rem;
+            max-height: calc(100vh - 6rem);
+            overflow-y: auto;
+            padding: 1rem;
+            border-left: 2px solid var(--border-color);
+        }
+        
+        .toc-sidebar h3 {
+            font-size: 1rem;
+            margin: 0 0 1rem 0;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        .toc-sidebar nav ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+            display: block !important;
+        }
+        
+        .toc-sidebar nav ul ul {
+            padding-left: 1rem;
+            margin-top: 0.25rem;
+            display: block !important;
+        }
+        
+        .toc-sidebar nav li {
+            margin: 0.5rem 0;
+            display: list-item !important;
+        }
+        
+        .toc-sidebar nav a {
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            line-height: 1.4;
+        }
+        
+         
+        .toc-sidebar nav > ul > li > a,
+        #TableOfContents > ul > li > a {
+            font-weight: 600;
+        }
+        
+        .toc-sidebar nav a:hover {
+            color: var(--link-color);
+        }
+        
+         
+        #TableOfContents ul {
+            display: block !important;
+        }
+        
+        #TableOfContents li {
+            display: list-item !important;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .header-content { flex-direction: column; gap: 1rem; }
+            nav ul { gap: 1rem; }
+            h1 { font-size: 2rem; }
+            article, .post-item { padding: 1rem; }
+            
+            .post-container {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .toc-sidebar {
+                width: 100%;
+                order: -1;
+            }
+            
+            .toc-sticky {
+                position: static;
+                max-height: none;
+                border-left: none;
+                border-top: 2px solid var(--border-color);
+                padding: 1rem 0;
+            }
+            
+            .post-content {
+                max-width: none;
+            }
+        }
+
+         
+        .highlight {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 4px;
+            margin: 0.4rem 0;
+            overflow-x: auto;
+        }
+        
+        .highlight pre {
+            margin: 0;
+            padding: 0.4rem 0.6rem;
+            border: none;
+            background: transparent;
+        }
+        
+        .bg { background-color:#fff; }
+        .chroma { 
+            background-color:#f6f8fa;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        .chroma .err { color:#f6f8fa;background-color:#82071e }
+        .chroma .lnlinks { outline:none;text-decoration:none;color:inherit }
+        .chroma .lntd { 
+            vertical-align:top;
+            padding:0;
+            margin:0;
+            border:0;
+            line-height: 1.4;
+        }
+        .chroma .lntd:first-child {
+            padding-right: 0.8em;
+            text-align: right;
+        }
+        .chroma .lntable { 
+            border-spacing:0;
+            padding:0.4rem 0.6rem;
+            margin:0;
+            border:0;
+            width: auto;
+            max-width: 100%;
+            font-size: 0.85rem;
+        }
+        .chroma .hl { background-color:#e5e5e5 }
+        .chroma .lnt { 
+            white-space:pre;
+            -webkit-user-select:none;
+            user-select:none;
+            color:#57606a;
+        }
+        .chroma .ln { 
+            white-space:pre;
+            -webkit-user-select:none;
+            user-select:none;
+            color:#57606a;
+        }
+        
+         
+        .toc-sidebar li {
+            display: block !important;
+        }
+        
+         
+        .chroma .k { color:#cf222e }
+        .chroma .kc { color:#cf222e }
+        .chroma .kd { color:#cf222e }
+        .chroma .kn { color:#cf222e }
+        .chroma .kp { color:#cf222e }
+        .chroma .kr { color:#cf222e }
+        .chroma .kt { color:#cf222e }
+        .chroma .na { color:#1f2328 }
+        .chroma .nc { color:#1f2328 }
+        .chroma .no { color:#0550ae }
+        .chroma .nd { color:#0550ae }
+        .chroma .ni { color:#6639ba }
+        .chroma .nl { color:#900;font-weight:bold }
+        .chroma .nn { color:#24292e }
+        .chroma .nx { color:#1f2328 }
+        .chroma .nt { color:#0550ae }
+        .chroma .nb { color:#6639ba }
+        .chroma .bp { color:#6a737d }
+        .chroma .nv { color:#953800 }
+        .chroma .vc { color:#953800 }
+        .chroma .vg { color:#953800 }
+        .chroma .vi { color:#953800 }
+        .chroma .vm { color:#953800 }
+        .chroma .nf { color:#6639ba }
+        .chroma .fm { color:#6639ba }
+        .chroma .s { color:#0a3069 }
+        .chroma .sa { color:#0a3069 }
+        .chroma .sb { color:#0a3069 }
+        .chroma .sc { color:#0a3069 }
+        .chroma .dl { color:#0a3069 }
+        .chroma .sd { color:#0a3069 }
+        .chroma .s2 { color:#0a3069 }
+        .chroma .se { color:#0a3069 }
+        .chroma .sh { color:#0a3069 }
+        .chroma .si { color:#0a3069 }
+        .chroma .sx { color:#0a3069 }
+        .chroma .sr { color:#0a3069 }
+        .chroma .s1 { color:#0a3069 }
+        .chroma .ss { color:#032f62 }
+        .chroma .m { color:#0550ae }
+        .chroma .mb { color:#0550ae }
+        .chroma .mf { color:#0550ae }
+        .chroma .mh { color:#0550ae }
+        .chroma .mi { color:#0550ae }
+        .chroma .il { color:#0550ae }
+        .chroma .mo { color:#0550ae }
+        .chroma .o { color:#0550ae }
+        .chroma .ow { color:#0550ae }
+        .chroma .p { color:#1f2328 }
+        .chroma .c { color:#57606a }
+        .chroma .ch { color:#57606a }
+        .chroma .cm { color:#57606a }
+        .chroma .c1 { color:#57606a }
+        .chroma .cs { color:#57606a }
+        .chroma .cp { color:#57606a }
+        .chroma .cpf { color:#57606a }
+        .chroma .gd { color:#82071e;background-color:#ffebe9 }
+        .chroma .ge { color:#1f2328 }
+        .chroma .gi { color:#116329;background-color:#dafbe1 }
+        .chroma .go { color:#1f2328 }
+        .chroma .gl { text-decoration:underline }
+        .chroma .w { color:#fff }
+        
+         
+        .highlight {
+            position: relative;
+        }
+        
+        .copy-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(240, 246, 252, 0.8);
+            border: 1px solid rgba(208, 215, 222, 0.8);
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 12px;
+            font-weight: 400;
+            color: #0969da;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease, background 0.1s ease, border-color 0.1s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .highlight:hover .copy-button {
+            opacity: 1;
+        }
+        
+        .copy-button:hover {
+            background: rgba(225, 228, 232, 0.9);
+            border-color: rgba(208, 215, 222, 1);
+        }
+        
+        .copy-button:active {
+            background: rgba(206, 212, 220, 0.9);
+        }
+        
+        .copy-button svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .copy-button .success-icon {
+            display: none !important;
+        }
+        
+        .copy-button.copied {
+            gap: 0;
+        }
+        
+        .copy-button.copied .copy-icon {
+            display: none !important;
+        }
+        
+        .copy-button.copied .success-icon {
+            display: inline !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <div class="container">
+        <div class="header-content">
+            <a href="/notes-site/" class="site-title">sleepydog</a>
+            <nav>
+                <ul>
+                    
+                    <li><a href="/notes-site/">Home</a></li>
+                    
+                    <li><a href="/notes-site/posts/">Posts</a></li>
+                    
+                    <li><a href="/notes-site/categories/">Categories</a></li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+
+    
+    <main>
+        <div class="container">
+            
+<div class="post-container">
+    
+    <aside class="toc-sidebar">
+        <div class="toc-sticky">
+            <h3>Table of Contents</h3>
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#synchronization">Synchronization</a>
+      <ul>
+        <li><a href="#barrier">Barrier</a></li>
+      </ul>
+    </li>
+    <li><a href="#point-to-point-p2p">Point-to-Point (P2P)</a>
+      <ul>
+        <li><a href="#sendrecv">Send/Recv</a></li>
+      </ul>
+    </li>
+    <li><a href="#one-to-all-broadcast">One-to-All (Broadcast)</a>
+      <ul>
+        <li><a href="#broadcast">Broadcast</a></li>
+        <li><a href="#scatter">Scatter</a></li>
+      </ul>
+    </li>
+    <li><a href="#all-to-one-reduction">All-to-One (Reduction)</a>
+      <ul>
+        <li><a href="#reduce">Reduce</a></li>
+        <li><a href="#gather">Gather</a></li>
+      </ul>
+    </li>
+    <li><a href="#all-to-all-global-exchange">All-to-All (Global Exchange)</a>
+      <ul>
+        <li><a href="#all-reduce">All-Reduce</a></li>
+        <li><a href="#all-gather">All-Gather</a></li>
+        <li><a href="#reduce-scatter">Reduce-Scatter</a></li>
+        <li><a href="#all-to-all">All-to-All</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </aside>
+    
+    
+    <article class="post-content">
+        <h1>Interview Prep: Communication Collectives (NCCL &amp; PyTorch)</h1>
+        <div class="post-meta">
+            <time>
+                <svg class="date-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                2025-10-25
+            </time>
+            
+            <time class="lastmod-inline">
+                <svg class="date-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                2025-10-26
+            </time>
+            
+            <span class="word-count">1415 words</span>
+            <span class="reading-time">7 minutes</span>
+            
+            <div class="categories">
+                
+                <a href="/notes-site/categories/job-hunting/" class="category-tag">Job Hunting</a>
+                
+            </div>
+            
+            
+            <div class="tags">
+                
+                <span class="tag">distributed</span>
+                
+                <span class="tag">nccl</span>
+                
+                <span class="tag">pytorch</span>
+                
+                <span class="tag">communication</span>
+                
+            </div>
+            
+        </div>
+        
+        <h1 id="communication-collectives">Communication Collectives</h1>
+<p><strong>Official Documentation:</strong></p>
+<ul>
+<li><a href="https://pytorch.org/docs/stable/distributed.html">PyTorch Distributed Docs</a></li>
+<li><a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/index.html">NCCL Documentation</a></li>
+</ul>
+<p><strong>Important Notes:</strong></p>
+<ul>
+<li><strong>Rank participation:</strong> All ranks in the process group must call the same collective with matching tensor shapes/dtypes.</li>
+<li><strong>In-place operations:</strong> Most PyTorch collectives modify tensors in-place; NCCL collectives can use separate input/output buffers or the same buffer.</li>
+<li><strong>CUDA streams:</strong> NCCL examples show explicit <code>cudaStreamSynchronize()</code> for clarity; in practice, synchronize as needed for your pipeline.</li>
+</ul>
+<h2 id="synchronization">Synchronization</h2>
+<h3 id="barrier">Barrier</h3>
+<p>Block until all ranks reach this point (no data transfer, collective synchronization).</p>
+<p><strong>PyTorch:</strong> <code>dist.barrier(group=None)</code> - <a href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.barrier">docs</a></p>
+<ul>
+<li><code>group</code>: Process group (optional, default: all processes)</li>
+<li>Returns: None</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># All ranks wait until everyone reaches this call</span>
+</span></span><span class="line"><span class="cl"><span class="n">dist</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Proceed after synchronization</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>NCCL:</strong> No direct equivalent (implicit in collective operations).</p>
+<p><strong>Use case:</strong> Synchronize ranks before/after critical sections, ensure all ranks reach a checkpoint together.</p>
+<hr>
+<h2 id="point-to-point-p2p">Point-to-Point (P2P)</h2>
+<h3 id="sendrecv">Send/Recv</h3>
+<p>Point-to-point communication between two processes.</p>
+<p><strong>PyTorch:</strong> <code>dist.send(tensor, dst)</code> / <code>dist.recv(tensor, src)</code> - <a href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.send">docs</a> / <a href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.recv">docs</a></p>
+<ul>
+<li><code>send(tensor, dst)</code>: Send tensor to dst rank</li>
+<li><code>recv(tensor, src)</code>: Receive into tensor from src rank</li>
+<li>Returns: None (blocking operations)</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dist</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">elif</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dist</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Rank 1 now has [1, 1]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>NCCL:</strong> <code>ncclSend(sendbuff, count, ncclFloat, peer, comm, stream)</code> / <code>ncclRecv(recvbuff, count, ncclFloat, peer, comm, stream)</code> - <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html#ncclsend">docs</a> / <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html#ncclrecv">docs</a></p>
+<ul>
+<li><code>sendbuff</code>: Input buffer to send (size = <code>count * sizeof(dtype)</code>)</li>
+<li><code>recvbuff</code>: Output buffer to receive (size = <code>count * sizeof(dtype)</code>)</li>
+<li><code>count</code>: Number of elements</li>
+<li><code>ncclFloat</code>: Data type</li>
+<li><code>peer</code>: Rank to communicate with</li>
+<li><code>comm</code>: NCCL communicator</li>
+<li><code>stream</code>: CUDA stream</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Rank 0 sends to rank 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">(</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ncclSend</span><span class="p">(</span><span class="n">sendbuff</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ncclFloat</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">stream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">ncclRecv</span><span class="p">(</span><span class="n">recvbuff</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ncclFloat</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">stream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cudaStreamSynchronize</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>Must be called in pairs (send on one rank, recv on another)</li>
+</ul>
+<hr>
+<h2 id="one-to-all-broadcast">One-to-All (Broadcast)</h2>
+<h3 id="broadcast">Broadcast</h3>
+<p>Send data from root to all processes.</p>
+<p><strong>Use case:</strong> Distribute model weights.</p>
+<p><strong>PyTorch:</strong> <code>dist.broadcast(tensor, src=0)</code> - <a href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.broadcast">docs</a></p>
+<ul>
+<li><code>tensor</code>: Input on src, output on all ranks</li>
+<li><code>src</code>: Source rank</li>
+<li>Returns: None (all ranks have src&rsquo;s data)</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dist</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># All ranks now have [1, 1]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>NCCL:</strong> <code>ncclBroadcast(sendbuff, recvbuff, count, ncclFloat, root, comm, stream)</code> - <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html#ncclbroadcast">docs</a></p>
+<ul>
+<li><code>sendbuff</code>: Input buffer (on root) or output buffer (on other ranks)</li>
+<li><code>recvbuff</code>: Output buffer (can be same as sendbuff for in-place)</li>
+<li><code>count</code>: Number of elements</li>
+<li><code>ncclFloat</code>: Data type (e.g., <code>ncclFloat</code>, <code>ncclInt</code>, <code>ncclBfloat16</code>)</li>
+<li><code>root</code>: Source rank</li>
+<li><code>comm</code>: NCCL communicator</li>
+<li><code>stream</code>: CUDA stream</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Root rank 0 broadcasts data to all ranks
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">ncclBroadcast</span><span class="p">(</span><span class="n">input_buf</span><span class="p">,</span> <span class="n">output_buf</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ncclFloat</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">stream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cudaStreamSynchronize</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h3 id="scatter">Scatter</h3>
+<p>Distribute different chunks from root to all processes.</p>
+<p><strong>PyTorch:</strong> <code>dist.scatter(tensor, scatter_list=scatter_list, src=0)</code></p>
+<ul>
+<li><code>tensor</code>: Output tensor</li>
+<li><code>scatter_list</code>: List of tensors to scatter (only on src)</li>
+<li><code>src</code>: Source rank</li>
+<li>Returns: None (each rank receives its chunk)</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">scatter_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">world_size</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">scatter_list</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl"><span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dist</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">scatter_list</span><span class="o">=</span><span class="n">scatter_list</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Each rank gets its corresponding chunk</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>NCCL:</strong> Not directly supported, use P2P sends/recvs.</p>
+<h2 id="all-to-one-reduction">All-to-One (Reduction)</h2>
+<h3 id="reduce">Reduce</h3>
+<p>Combine values from all processes to one root process.</p>
+<p><strong>Note:</strong> All ranks must call <code>reduce()</code> with matching tensor shapes/dtypes. Only the root rank has a valid result after the operation; non-root ranks&rsquo; output is undefined.</p>
+<p><strong>PyTorch:</strong> <code>dist.reduce(tensor, dst=0, op=dist.ReduceOp.SUM)</code> - <a href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.reduce">docs</a></p>
+<ul>
+<li><code>tensor</code>: Input/output tensor (modified in-place)</li>
+<li><code>dst</code>: Destination rank (root)</li>
+<li><code>op</code>: Reduction operation (SUM, PRODUCT, MIN, MAX, etc.)</li>
+<li>Returns: None (only dst rank has valid result)</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">rank</span>
+</span></span><span class="line"><span class="cl"><span class="n">dist</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Only rank 0 has the sum</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>NCCL:</strong> <code>ncclReduce(sendbuff, recvbuff, count, ncclFloat, ncclSum, root, comm, stream)</code> - <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html#ncclreduce">docs</a></p>
+<ul>
+<li><code>sendbuff</code>: Input buffer from all ranks</li>
+<li><code>recvbuff</code>: Output buffer (only valid on root rank)</li>
+<li><code>count</code>: Number of elements</li>
+<li><code>ncclFloat</code>: Data type</li>
+<li><code>ncclSum</code>: Reduction operation (ncclSum, ncclProd, ncclMax, ncclMin)</li>
+<li><code>root</code>: Destination rank</li>
+<li><code>comm</code>: NCCL communicator</li>
+<li><code>stream</code>: CUDA stream</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// All ranks contribute data, only root receives result
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">ncclReduce</span><span class="p">(</span><span class="n">sendbuff</span><span class="p">,</span> <span class="n">recvbuff</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ncclFloat</span><span class="p">,</span> <span class="n">ncclSum</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">stream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cudaStreamSynchronize</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h3 id="gather">Gather</h3>
+<p>Collect data from all processes to root.</p>
+<p><strong>PyTorch:</strong> <code>dist.gather(tensor, gather_list=tensor_list, dst=0)</code></p>
+<ul>
+<li><code>tensor</code>: Input tensor</li>
+<li><code>gather_list</code>: List to store gathered tensors (only on dst)</li>
+<li><code>dst</code>: Destination rank</li>
+<li>Returns: None (only dst has gather_list filled)</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">rank</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tensor_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">world_size</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dist</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">gather_list</span><span class="o">=</span><span class="n">tensor_list</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dist</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Only rank 0 has full tensor_list</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>NCCL:</strong> Use <code>ncclAllGather</code> then select on root, or implement with P2P.</p>
+<h2 id="all-to-all-global-exchange">All-to-All (Global Exchange)</h2>
+<h3 id="all-reduce">All-Reduce</h3>
+<p>Combine values from all processes and distribute result to all.</p>
+<p><strong>Use case:</strong> Aggregate gradients in data parallelism.</p>
+<p><strong>PyTorch:</strong> <code>dist.all_reduce(tensor, op=dist.ReduceOp.SUM)</code> - <a href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.all_reduce">docs</a></p>
+<ul>
+<li><code>tensor</code>: Input/output tensor (modified in-place)</li>
+<li><code>op</code>: Reduction operation (SUM, PRODUCT, MIN, MAX, etc.)</li>
+<li>Returns: None (modifies tensor in-place)</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">rank</span>
+</span></span><span class="line"><span class="cl"><span class="n">dist</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Result: tensor = [sum of all ranks] on all GPUs</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>NCCL:</strong> <code>ncclAllReduce(sendbuff, recvbuff, count, ncclFloat, ncclSum, comm, stream)</code> - <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html#ncclallreduce">docs</a></p>
+<ul>
+<li><code>sendbuff</code>: Input buffer (contributions from this rank)</li>
+<li><code>recvbuff</code>: Output buffer (reduced result on all ranks, can be same as sendbuff)</li>
+<li><code>count</code>: Number of elements</li>
+<li><code>ncclFloat</code>: Data type (ncclFloat, ncclBfloat16, ncclInt8, etc.)</li>
+<li><code>ncclSum</code>: Reduction operation (ncclSum, ncclProd, ncclMax, ncclMin)</li>
+<li><code>comm</code>: NCCL communicator</li>
+<li><code>stream</code>: CUDA stream</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// All ranks contribute and receive the reduced result
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">ncclAllReduce</span><span class="p">(</span><span class="n">sendbuff</span><span class="p">,</span> <span class="n">recvbuff</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ncclFloat</span><span class="p">,</span> <span class="n">ncclSum</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">stream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cudaStreamSynchronize</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h3 id="all-gather">All-Gather</h3>
+<p>Gather data from all processes and distribute to all.</p>
+<p><strong>Use case:</strong> Collect outputs in tensor parallelism.</p>
+<p><strong>PyTorch:</strong> <code>dist.all_gather(tensor_list, tensor)</code> - <a href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.all_gather">docs</a></p>
+<ul>
+<li><code>tensor_list</code>: List of output tensors (one per rank)</li>
+<li><code>tensor</code>: Input tensor to gather</li>
+<li>Returns: None (tensor_list filled with all ranks&rsquo; data)</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">rank</span>
+</span></span><span class="line"><span class="cl"><span class="n">tensor_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">world_size</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="n">dist</span><span class="o">.</span><span class="n">all_gather</span><span class="p">(</span><span class="n">tensor_list</span><span class="p">,</span> <span class="n">tensor</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># tensor_list = [[0,0], [1,1], [2,2], ...] on all ranks</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>NCCL:</strong> <code>ncclAllGather(sendbuff, recvbuff, sendcount, ncclFloat, comm, stream)</code> - <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html#ncclallgather">docs</a></p>
+<ul>
+<li><code>sendbuff</code>: Input buffer from this rank (size = <code>sendcount * sizeof(dtype)</code>)</li>
+<li><code>recvbuff</code>: Output buffer receiving data from all ranks (size = <code>nranks * sendcount * sizeof(dtype)</code>)</li>
+<li><code>sendcount</code>: Number of elements to send per rank</li>
+<li><code>ncclFloat</code>: Data type</li>
+<li><code>comm</code>: NCCL communicator</li>
+<li><code>stream</code>: CUDA stream</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Each rank sends its buffer, receives all buffers concatenated
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">ncclAllGather</span><span class="p">(</span><span class="n">sendbuff</span><span class="p">,</span> <span class="n">recvbuff</span><span class="p">,</span> <span class="n">sendcount</span><span class="p">,</span> <span class="n">ncclFloat</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">stream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cudaStreamSynchronize</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h3 id="reduce-scatter">Reduce-Scatter</h3>
+<p>Reduce then scatter chunks to different processes.</p>
+<p><strong>Use case:</strong> Gradient sharding in ZeRO.</p>
+<p><strong>PyTorch:</strong> <code>dist.reduce_scatter(output, input_list, op=dist.ReduceOp.SUM)</code> - <a href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.reduce_scatter">docs</a></p>
+<ul>
+<li><code>output</code>: Output tensor (receives one chunk)</li>
+<li><code>input_list</code>: List of tensors to reduce (one chunk per rank, length must equal world_size)</li>
+<li><code>op</code>: Reduction operation (default: SUM)</li>
+<li>Returns: None (each rank gets reduced chunk)</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># Assume world_size == 2</span>
+</span></span><span class="line"><span class="cl"><span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">rank</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Each element in chunks corresponds to a chunk for each rank</span>
+</span></span><span class="line"><span class="cl"><span class="n">chunks</span> <span class="o">=</span> <span class="p">[</span><span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">(),</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">()]</span>
+</span></span><span class="line"><span class="cl"><span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dist</span><span class="o">.</span><span class="n">reduce_scatter</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Each rank gets a different reduced chunk</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>NCCL:</strong> <code>ncclReduceScatter(sendbuff, recvbuff, recvcount, ncclFloat, ncclSum, comm, stream)</code> - <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html#ncclreducescatter">docs</a></p>
+<ul>
+<li><code>sendbuff</code>: Input buffer from this rank (size = <code>nranks * recvcount * sizeof(dtype)</code>)</li>
+<li><code>recvbuff</code>: Output buffer receiving reduced chunk (size = <code>recvcount * sizeof(dtype)</code>)</li>
+<li><code>recvcount</code>: Number of elements per rank in output</li>
+<li><code>ncclFloat</code>: Data type</li>
+<li><code>ncclSum</code>: Reduction operation</li>
+<li><code>comm</code>: NCCL communicator</li>
+<li><code>stream</code>: CUDA stream</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Each rank contributes chunks, receives one reduced chunk
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">ncclReduceScatter</span><span class="p">(</span><span class="n">sendbuff</span><span class="p">,</span> <span class="n">recvbuff</span><span class="p">,</span> <span class="n">recvcount</span><span class="p">,</span> <span class="n">ncclFloat</span><span class="p">,</span> <span class="n">ncclSum</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">stream</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cudaStreamSynchronize</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h3 id="all-to-all">All-to-All</h3>
+<p>Each process sends different data to every other process and receives different data from each.</p>
+<p><strong>Use case:</strong> Tensor redistribution in model parallelism, sequence parallelism.</p>
+<p><strong>PyTorch:</strong> <code>dist.all_to_all(output_list, input_list)</code> - <a href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.all_to_all">docs</a></p>
+<ul>
+<li><code>output_list</code>: List of output tensors (one per rank)</li>
+<li><code>input_list</code>: List of input tensors to send (one per rank)</li>
+<li>Returns: None (output_list[i] receives data from rank i)</li>
+<li><strong>Example:</strong>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># Each rank sends different data to each other rank</span>
+</span></span><span class="line"><span class="cl"><span class="n">input_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">rank</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">world_size</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="n">output_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">world_size</span><span class="p">)]</span>
+</span></span><span class="line"><span class="cl"><span class="n">dist</span><span class="o">.</span><span class="n">all_to_all</span><span class="p">(</span><span class="n">output_list</span><span class="p">,</span> <span class="n">input_list</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># output_list[i] contains data sent from rank i to current rank</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p><strong>PyTorch (single tensor):</strong> <code>dist.all_to_all_single(output, input, output_split_sizes, input_split_sizes)</code></p>
+<ul>
+<li><code>output</code>: Output tensor</li>
+<li><code>input</code>: Input tensor</li>
+<li><code>output_split_sizes</code>: List of chunk sizes to receive from each rank</li>
+<li><code>input_split_sizes</code>: List of chunk sizes to send to each rank</li>
+<li>More efficient for contiguous tensors</li>
+</ul>
+<p><strong>Backend support:</strong> <code>dist.all_to_all</code> is supported with Gloo and NCCL backends only.</p>
+<p><strong>NCCL:</strong> Not directly supported in NCCL, typically implemented with multiple send/recv pairs or using <code>ncclGroupStart()</code>/<code>ncclGroupEnd()</code> to batch P2P operations. See <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html#ncclsend">ncclSend</a> and <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html#ncclrecv">ncclRecv</a>.</p>
+
+        
+        
+<div class="comments-section">
+    <script src="https://giscus.app/client.js"
+        data-repo="sleepydog-q/notes-site"
+        data-repo-id="R_kgDOQIjY8w"
+        data-category="General"
+        data-category-id="DIC_kwDOQIjY884CxCKj"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+    </script>
+</div>
+
+
+
+    </article>
+</div>
+
+        </div>
+    </main>
+    
+    <footer>
+    <div class="container">
+        <p>&copy; 2025 sleepydog | Personal blog and knowledge base</p>
+        
+        <p><a href="https://github.com/sleepydog-q" target="_blank">GitHub</a></p>
+        
+    </div>
+</footer>
+
+
+    
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const highlights = document.querySelectorAll('.highlight');
+            
+            highlights.forEach(highlight => {
+                
+                const button = document.createElement('button');
+                button.className = 'copy-button';
+                
+                
+                const copyIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                copyIcon.setAttribute('viewBox', '0 0 16 16');
+                copyIcon.innerHTML = '<path fill="currentColor" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path fill="currentColor" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/>';
+                copyIcon.className = 'copy-icon';
+                
+                
+                const checkIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                checkIcon.setAttribute('viewBox', '0 0 16 16');
+                checkIcon.innerHTML = '<path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/>';
+                checkIcon.className = 'success-icon';
+                checkIcon.style.display = 'none';
+                
+                button.appendChild(copyIcon);
+                button.appendChild(checkIcon);
+                
+                
+                const codeBlock = highlight.querySelector('code');
+                if (!codeBlock) return;
+                
+                
+                button.addEventListener('click', function() {
+                    
+                    let code = '';
+                    
+                    
+                    const table = codeBlock.closest('.highlight')?.querySelector('table.lntable');
+                    if (table) {
+                        
+                        const codeCell = table.querySelector('td.lntd:last-child');
+                        if (codeCell) {
+                            code = codeCell.textContent || codeCell.innerText;
+                        }
+                    } else {
+                        
+                        code = codeBlock.textContent;
+                    }
+                    
+                    
+                    code = code.trim();
+                    
+                    navigator.clipboard.writeText(code).then(() => {
+                        copyIcon.style.display = 'none';
+                        checkIcon.style.display = 'inline';
+                        setTimeout(() => {
+                            copyIcon.style.display = 'inline';
+                            checkIcon.style.display = 'none';
+                        }, 2000);
+                    });
+                });
+                
+                highlight.appendChild(button);
+            });
+        });
+    </script>
+</body>
+</html>
+

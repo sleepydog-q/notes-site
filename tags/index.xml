@@ -1,1 +1,75 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tags on sleepydog</title><link>https://sleepydog-q.github.io/notes-site/tags/</link><description>Recent content in Tags on sleepydog</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 24 Oct 2025 22:28:05 +0000</lastBuildDate><atom:link href="https://sleepydog-q.github.io/notes-site/tags/index.xml" rel="self" type="application/rss+xml"/><item><title>Infrastructure</title><link>https://sleepydog-q.github.io/notes-site/tags/infrastructure/</link><pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate><guid>https://sleepydog-q.github.io/notes-site/tags/infrastructure/</guid><description/></item><item><title>Interview</title><link>https://sleepydog-q.github.io/notes-site/tags/interview/</link><pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate><guid>https://sleepydog-q.github.io/notes-site/tags/interview/</guid><description/></item><item><title>Ml-Inference</title><link>https://sleepydog-q.github.io/notes-site/tags/ml-inference/</link><pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate><guid>https://sleepydog-q.github.io/notes-site/tags/ml-inference/</guid><description/></item><item><title>About</title><link>https://sleepydog-q.github.io/notes-site/tags/about/</link><pubDate>Fri, 24 Oct 2025 09:00:00 -0400</pubDate><guid>https://sleepydog-q.github.io/notes-site/tags/about/</guid><description/></item><item><title>Welcome</title><link>https://sleepydog-q.github.io/notes-site/tags/welcome/</link><pubDate>Fri, 24 Oct 2025 09:00:00 -0400</pubDate><guid>https://sleepydog-q.github.io/notes-site/tags/welcome/</guid><description/></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on sleepydog</title>
+    <link>https://sleepydog-q.github.io/notes-site/tags/</link>
+    <description>Recent content in Tags on sleepydog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 26 Oct 2025 04:10:44 +0000</lastBuildDate>
+    <atom:link href="https://sleepydog-q.github.io/notes-site/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Communication</title>
+      <link>https://sleepydog-q.github.io/notes-site/tags/communication/</link>
+      <pubDate>Sat, 25 Oct 2025 01:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/tags/communication/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Distributed</title>
+      <link>https://sleepydog-q.github.io/notes-site/tags/distributed/</link>
+      <pubDate>Sat, 25 Oct 2025 01:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/tags/distributed/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Nccl</title>
+      <link>https://sleepydog-q.github.io/notes-site/tags/nccl/</link>
+      <pubDate>Sat, 25 Oct 2025 01:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/tags/nccl/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Pytorch</title>
+      <link>https://sleepydog-q.github.io/notes-site/tags/pytorch/</link>
+      <pubDate>Sat, 25 Oct 2025 01:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/tags/pytorch/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Infrastructure</title>
+      <link>https://sleepydog-q.github.io/notes-site/tags/infrastructure/</link>
+      <pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/tags/infrastructure/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Interview</title>
+      <link>https://sleepydog-q.github.io/notes-site/tags/interview/</link>
+      <pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/tags/interview/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ml-Inference</title>
+      <link>https://sleepydog-q.github.io/notes-site/tags/ml-inference/</link>
+      <pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/tags/ml-inference/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>About</title>
+      <link>https://sleepydog-q.github.io/notes-site/tags/about/</link>
+      <pubDate>Fri, 24 Oct 2025 09:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/tags/about/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Welcome</title>
+      <link>https://sleepydog-q.github.io/notes-site/tags/welcome/</link>
+      <pubDate>Fri, 24 Oct 2025 09:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/tags/welcome/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

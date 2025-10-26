@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en-us">
-<head><script src="/notes-site/livereload.js?mindelay=10&amp;v=2&amp;port=50882&amp;path=notes-site/livereload" data-no-instant defer></script>
+<head><script src="/notes-site/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=notes-site/livereload" data-no-instant defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coding Interview Prep (ML Infra) | sleepydog</title>
+    <title>Interview Prep: ML Infra Coding | sleepydog</title>
     <meta name="description" content="Personal blog and knowledge base">
     <style>
         :root {
@@ -127,6 +127,13 @@
         h2 { font-size: 1.5rem; }
         h3 { font-size: 1.25rem; }
         
+         
+        .post-content > h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
         a {
             color: #0066cc;
             text-decoration: none;
@@ -144,25 +151,37 @@
         .post-meta {
             color: #6c757d;
             font-size: 0.85rem;
-            margin: 0.25rem 0 0.5rem;
-            line-height: 1.5;
+            margin: 0.25rem 0 1.5rem;
+            line-height: 1.6;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
         }
         
         .post-meta time {
-            margin-right: 1rem;
+            color: #6c757d;
         }
         
-        .post-footer-meta {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-            text-align: right;
+        .post-meta .lastmod-inline {
+            color: #6c757d;
         }
         
-        .post-footer-meta .lastmod {
-            color: #888;
-            font-size: 0.85rem;
-            font-style: italic;
+        .post-meta .word-count,
+        .post-meta .reading-time {
+            color: #6c757d;
+        }
+        
+        .post-meta .word-count::before {
+            content: " ";
+            margin-left: 0.3rem;
+        }
+        
+        .post-meta .categories,
+        .post-meta .tags {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
         }
         
         .comments-section {
@@ -176,8 +195,8 @@
         }
         
         .post-item {
-            padding: 0.75rem 0;
-            margin-bottom: 1rem;
+            padding: 1.5rem 0;
+            margin-bottom: 0;
             border-bottom: 1px solid var(--border-color);
         }
         
@@ -186,13 +205,57 @@
         }
         
         .post-item h2 {
-            margin: 0 0 0.2rem 0;
-            font-size: 1.2rem;
-            font-weight: 500;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.3;
         }
         
         .post-item h2 a {
             color: var(--text-color);
+        }
+        
+        .post-meta-compact {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .author-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .author-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .meta-separator {
+            color: #999;
+        }
+        
+        .category-link {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+        
+        .category-link:hover {
+            text-decoration: underline;
+        }
+        
+        .post-summary {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
         
         .categories {
@@ -573,9 +636,14 @@
     
     
     <article class="post-content">
-        <h1>Coding Interview Prep (ML Infra)</h1>
+        <h1>Interview Prep: ML Infra Coding</h1>
         <div class="post-meta">
-            <time>October 24, 2025</time>
+            <time>2025-10-24</time>
+            
+            <time class="lastmod-inline">2025-10-24</time>
+            
+            <span class="word-count">226 words</span>
+            <span class="reading-time">2 minutes</span>
             
             <div class="categories">
                 
@@ -715,12 +783,6 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div>
-        
-        
-        <div class="post-footer-meta">
-            <span class="lastmod">Updated: October 24, 2025</span>
-        </div>
-        
         
         
 <div class="comments-section">

@@ -1,1 +1,26 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Job Hunting on sleepydog</title><link>https://sleepydog-q.github.io/notes-site/categories/job-hunting/</link><description>Recent content in Job Hunting on sleepydog</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 24 Oct 2025 22:28:05 +0000</lastBuildDate><atom:link href="https://sleepydog-q.github.io/notes-site/categories/job-hunting/index.xml" rel="self" type="application/rss+xml"/><item><title>ML Inference / Infra Interview Prep</title><link>https://sleepydog-q.github.io/notes-site/posts/job-hunting/ml-inference/</link><pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate><guid>https://sleepydog-q.github.io/notes-site/posts/job-hunting/ml-inference/</guid><description>Interview prep notes for ML Inference positions.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Job Hunting on sleepydog</title>
+    <link>https://sleepydog-q.github.io/notes-site/categories/job-hunting/</link>
+    <description>Recent content in Job Hunting on sleepydog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 26 Oct 2025 04:10:44 +0000</lastBuildDate>
+    <atom:link href="https://sleepydog-q.github.io/notes-site/categories/job-hunting/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Interview Prep: Communication Collectives (NCCL &amp; PyTorch)</title>
+      <link>https://sleepydog-q.github.io/notes-site/posts/job-hunting/communication-collectives/</link>
+      <pubDate>Sat, 25 Oct 2025 01:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/posts/job-hunting/communication-collectives/</guid>
+      <description>Reference guide for distributed communication collectives with PyTorch and NCCL examples.</description>
+    </item>
+    <item>
+      <title>Interview Prep: ML Inference and Infrastructure (LLM)</title>
+      <link>https://sleepydog-q.github.io/notes-site/posts/job-hunting/ml-inference/</link>
+      <pubDate>Fri, 24 Oct 2025 10:00:00 -0400</pubDate>
+      <guid>https://sleepydog-q.github.io/notes-site/posts/job-hunting/ml-inference/</guid>
+      <description>Interview prep notes for ML Inference positions.</description>
+    </item>
+  </channel>
+</rss>
